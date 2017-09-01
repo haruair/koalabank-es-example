@@ -6,6 +6,15 @@ html, body {
 body {
     font-family: 'helvetica neue', arial, sans-serif;
 }
+
+button {
+    font-size: 13px;
+    border: 1px solid #ddd;
+    background: #ddd;
+    padding: 3px 10px;
+    border-radius: 3px;
+}
+
 #app {
     display: flex;
     min-height: 100%;
@@ -21,22 +30,60 @@ h1 {
     font-size: 16px;
 }
 .events {
-    background: #eee;
+    color: #fff;
+    background: #4f4f65;
     padding: 15px;
+    box-shadow: inset 3px 0 10px rgba(0,0,0,0.2);
+}
+.event {
+    color: #ddd;
+}
+.event .eventName {
+    color: #9dff93;
 }
 .events pre {
-    background: #fff;
+    background: #2d2d3e;
+    color: #fff;
     padding: 10px;
+}
+.events pre div + div {
+    border-top: 1px solid #4f4f65;
+    padding-top: 10px;
+    margin-top: 10px;
 }
 .account {
     padding: 10px;
     background: #fafafa;
     margin-top: 10px;
+    border: 2px solid #ddd;
+}
+.account .btns {
+    margin-top: 10px;
 }
 
-.read-model-related {
+.read-model-related,
+.header {
     padding: 10px;
-    background: #555;
+    background: #4d5098;
+    color: #fff;
+}
+.header {
+    padding-bottom: 0;
+}
+.header h1 {
+    display: inline-block;
+    border-bottom: 3px solid #686cce;
+}
+.commands,
+.read-model {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin: 10px;
+    box-shadow: 0 3px 3px rgba(0,0,0,0.1);
+}
+.commands .command {
+    margin: 10px 0;
 }
 .read-model {
     padding: 10px;

@@ -9,28 +9,35 @@
 <body>
   <div id="app">
     <div class="actions">
+      <div class="header">
+        <h1>KoalaBank</h1>
+      </div>
       <div class="read-model-related">
-        <input type="text" v-model="name">
-        <button type="button" v-on:click="openAccount(name)">Open Account</button>
         <button type="button" v-on:click="cleanReadModel()">Clean read model</button>
         <button type="button" v-on:click="replayFromEvents()">Replay from events</button>
         <button type="button" v-on:click="replayFromEventsSlowly()">Replay from events slowly</button>
       </div>
+
+      <div class="commands">
+        <h1>Open Command</h1>
+        <div class="command">
+          <input type="text" v-model="name">
+          <button type="button" v-on:click="openAccount(name)">Open Account</button>
+        </div>
+      </div>
+
       <div class="read-model">
         <h1>Read Model (accounts)</h1>
         <div v-if="accounts.length == 0" class="account">
           Read model is empty.
         </div>
         <div v-for="account in accounts" class="account">
-          <div>{{ account.name }} <small>{{ account.id }}</small></div>
+          <div>{{ account.name }} <small>{{ account.id }}</small> <span v-if="account.closed" class="status">Closed</span></div>
           <div>$ {{ account.balance }}</div>
-          <div v-if="! account.closed">
+          <div v-if="! account.closed" class="btns">
             <button type="button" v-on:click="depositAccount(account.id, 100)">Deposit 100 dollar</button>
             <button type="button" v-on:click="withdrawAccount(account.id, 100)">Withdraw 100 dollar</button>
             <button type="button" v-on:click="closeAccount(account.id)">Close Account</button>
-          </div>
-          <div v-else>
-            <span class="status">Closed</span>
           </div>
         </div>
       </div>
@@ -38,7 +45,7 @@
 
     <div class="events">
       <h1>Events <button v-on:click="cleanup()">Remove all</button></h1>
-      <pre v-if="events.length > 0"><div v-for="event in events">{{ event.payload.constructor.name }} {{ event.payload }}</div></pre>
+      <pre v-if="events.length > 0"><div v-for="event in events" class="event"><span class="eventName">{{ event.payload.constructor.name }}</span> {{ event.payload }}</div></pre>
       <pre v-if="events.length == 0">No event recorded.</pre>
     </div>
   </div>
@@ -87,8 +94,9 @@
 
         playEventWithDelay: function (queue) {
           var event = queue.shift()
-          this.eventBus.publish([event])
+          if (!event) return
 
+          this.eventBus.publish([event])
           if (queue.length === 0) return
 
           setTimeout(() => {
