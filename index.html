@@ -106,6 +106,7 @@
             this.playEventWithDelay(queue)
           }, 500)
         },
+
         openAccount: function (name) {
           var id = generatedId()
           this.commandBus.dispatch(new OpenCommand(id, name))
@@ -124,10 +125,12 @@
         },
 
         loadCurrentEvents: function () {
+          // LocalStorageEventStore specific implementation.
           this.events = this.eventStore.getStorage().reverse()
         },
 
         cleanup: function () {
+          // LocalStorageEventStore specific implementation.
           window.localStorage.removeItem('event-store')
           this.loadCurrentEvents()
         }

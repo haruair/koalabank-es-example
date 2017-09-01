@@ -59,7 +59,7 @@ class LocalStorageEventStore {
   }
 }
 
-class EventStore {
+class InMemoryEventStore {
   load(id) {
     this.events = this.events || [];
     return this.events.filter(v => v.id == id)
