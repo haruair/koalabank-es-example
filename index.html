@@ -14,6 +14,7 @@
         <button type="button" v-on:click="openAccount(name)">Open Account</button>
         <button type="button" v-on:click="cleanReadModel()">Clean read model</button>
         <button type="button" v-on:click="replayFromEvents()">Replay from events</button>
+        <button type="button" v-on:click="replayFromEventsSlowly()">Replay from events slowly</button>
       </div>
       <div class="read-model">
         <h1>Read Model (accounts)</h1>
@@ -57,13 +58,11 @@
         this.eventBus.subscribe(new AccountsSubscriber(this.accounts))
         this.eventBus.subscribe(new SimpleSubscriber(v => this.loadCurrentEvents()))
 
-        this.repository = new Repository(this.eventStore, this.eventBus, BankAccount)
-        this.bankAccountCommandHandler = new BankAccountCommandHandler(this.repository)
+        var repository = new Repository(this.eventStore, this.eventBus, BankAccount)
+        var bankAccountCommandHandler = new BankAccountCommandHandler(repository)
 
         this.commandBus = new CommandBus
-        this.commandBus.subscribe(this.bankAccountCommandHandler)
-
-        this.loadCurrentEvents()
+        this.commandBus.subscribe(bankAccountCommandHandler)
       },
       mounted: function () {
         this.replayFromEvents()
@@ -72,21 +71,43 @@
         cleanReadModel: function () {
           while(this.accounts.length > 0) this.accounts.pop()
         },
+
         replayFromEvents: function () {
           this.cleanReadModel()
           this.eventStore.fetch(v => v, event => this.eventBus.publish([event.payload]))
         },
 
+        replayFromEventsSlowly: function () {
+          this.cleanReadModel()
+          var events = []
+          this.eventStore.fetch(v => v, event => events.push(event.payload))
+
+          this.playEventWithDelay(events)
+        },
+
+        playEventWithDelay: function (queue) {
+          var event = queue.shift()
+          this.eventBus.publish([event])
+
+          if (queue.length === 0) return
+
+          setTimeout(() => {
+            this.playEventWithDelay(queue)
+          }, 500)
+        },
         openAccount: function (name) {
           var id = generatedId()
           this.commandBus.dispatch(new OpenCommand(id, name))
         },
+
         withdrawAccount: function(id, amount) {
           this.commandBus.dispatch(new WithdrawCommand(id, amount))
         },
+
         depositAccount: function(id, amount) {
           this.commandBus.dispatch(new DepositCommand(id, amount))
         },
+
         closeAccount: function(id, amount) {
           this.commandBus.dispatch(new CloseCommand(id))
         },
@@ -94,6 +115,7 @@
         loadCurrentEvents: function () {
           this.events = this.eventStore.getStorage().reverse()
         },
+
         cleanup: function () {
           window.localStorage.removeItem('event-store')
           this.loadCurrentEvents()
