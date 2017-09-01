@@ -1,0 +1,53 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+body {
+    font-family: 'helvetica neue', arial, sans-serif;
+}
+#app {
+    display: flex;
+    min-height: 100%;
+}
+.actions, .events {
+    width: 50%;
+    box-sizing: border-box;
+    min-height: 100%;
+}
+h1 {
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+}
+.events {
+    background: #eee;
+    padding: 15px;
+}
+.events pre {
+    background: #fff;
+    padding: 10px;
+}
+.account {
+    padding: 10px;
+    background: #fafafa;
+    margin-top: 10px;
+}
+
+.read-model-related {
+    padding: 10px;
+    background: #555;
+}
+.read-model {
+    padding: 10px;
+}
+.status {
+    padding: 3px 5px;
+    background: #ffd9d9;
+    display: inline-block;
+    border-radius: 5px;
+    font-size: 12px;
+}
+small {
+    color: #777;
+}

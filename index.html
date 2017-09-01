@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Welcome to Vue</title>
+  <script src="es.js"></script>
+  <script src="https://unpkg.com/vue"></script>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div id="app">
+    <div class="actions">
+      <div class="read-model-related">
+        <input type="text" v-model="name">
+        <button type="button" v-on:click="openAccount(name)">Open Account</button>
+        <button type="button" v-on:click="cleanReadModel()">Clean read model</button>
+        <button type="button" v-on:click="replayFromEvents()">Replay from events</button>
+      </div>
+      <div class="read-model">
+        <h1>Read Model (accounts)</h1>
+        <div v-if="accounts.length == 0" class="account">
+          Read model is empty.
+        </div>
+        <div v-for="account in accounts" class="account">
+          <div>{{ account.name }} <small>{{ account.id }}</small></div>
+          <div>$ {{ account.balance }}</div>
+          <div v-if="! account.closed">
+            <button type="button" v-on:click="depositAccount(account.id, 100)">Deposit 100 dollar</button>
+            <button type="button" v-on:click="withdrawAccount(account.id, 100)">Withdraw 100 dollar</button>
+            <button type="button" v-on:click="closeAccount(account.id)">Close Account</button>
+          </div>
+          <div v-else>
+            <span class="status">Closed</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="events">
+      <h1>Events <button v-on:click="cleanup()">Remove all</button></h1>
+      <pre v-if="events.length > 0"><div v-for="event in events">{{ event.payload.constructor.name }} {{ event.payload }}</div></pre>
+      <pre v-if="events.length == 0">No event recorded.</pre>
+    </div>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        name: 'Koala',
+        events: [],
+        accounts: []  // readModel
+      },
+      created: function () {
+        this.eventStore = new LocalStorageEventStore
+        this.eventBus = new EventBus
+
+        this.eventBus.subscribe(new AccountsSubscriber(this.accounts))
+        this.eventBus.subscribe(new SimpleSubscriber(v => this.loadCurrentEvents()))
+
+        this.repository = new Repository(this.eventStore, this.eventBus, BankAccount)
+        this.bankAccountCommandHandler = new BankAccountCommandHandler(this.repository)
+
+        this.commandBus = new CommandBus
+        this.commandBus.subscribe(this.bankAccountCommandHandler)
+
+        this.loadCurrentEvents()
+      },
+      mounted: function () {
+        this.replayFromEvents()
+      },
+      methods: {
+        cleanReadModel: function () {
+          while(this.accounts.length > 0) this.accounts.pop()
+        },
+        replayFromEvents: function () {
+          this.cleanReadModel()
+          this.eventStore.fetch(v => v, event => this.eventBus.publish([event.payload]))
+        },
+
+        openAccount: function (name) {
+          var id = generatedId()
+          this.commandBus.dispatch(new OpenCommand(id, name))
+        },
+        withdrawAccount: function(id, amount) {
+          this.commandBus.dispatch(new WithdrawCommand(id, amount))
+        },
+        depositAccount: function(id, amount) {
+          this.commandBus.dispatch(new DepositCommand(id, amount))
+        },
+        closeAccount: function(id, amount) {
+          this.commandBus.dispatch(new CloseCommand(id))
+        },
+
+        loadCurrentEvents: function () {
+          this.events = this.eventStore.getStorage().reverse()
+        },
+        cleanup: function () {
+          window.localStorage.removeItem('event-store')
+          this.loadCurrentEvents()
+        }
+      }
+    })
+  </script>
+</body>
+</html>
