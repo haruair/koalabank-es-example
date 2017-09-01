@@ -38,9 +38,54 @@ h1 {
 .event {
     color: #ddd;
 }
-.event .eventName {
-    color: #9dff93;
+.event-name {
+    color: #fff;
 }
+.event-name-opened {
+    color: #13ffb6;
+}
+.event-name-closed {
+    color: #ffdb13;
+}
+.event-name-withdrawed {
+    color: #ff139d;
+}
+.event-name-deposited {
+    color: #13e5ff;
+}
+
+.command-btn {
+    line-height: 16px;
+    position: relative;
+    padding-left: 20px;
+}
+.command-btn:before {
+    vertical-align: middle;
+    line-height: 16px;
+    display: inline-block;
+    content: '';
+    width: 10px;
+    margin-right: 5px;
+    position: absolute;
+    border-radius: 3px 0 0 3px;
+    left: -1px;
+    top: -1px;
+    bottom: -1px;
+}
+
+.command-open:before {
+    background: #13ffb6;
+}
+.command-close:before {
+    background: #ffdb13;
+}
+.command-withdraw:before {
+    background: #ff139d;
+}
+.command-deposit:before {
+    background: #13e5ff;
+}
+
 .events pre {
     background: #2d2d3e;
     color: #fff;
