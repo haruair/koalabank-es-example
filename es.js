@@ -13,7 +13,8 @@ class LocalStorageEventStore {
       var payload = v.domainEvent.payload
       var props = this.convertPayloadToProps(payload)
       var event = Object.create(eval(v['@type']).prototype, props)
-      return new DomainEvent(payload.id, event)
+      var createdAt = v['@createdAt']
+      return new DomainEvent(payload.id, event, createdAt)
     })
 
     return data
@@ -34,6 +35,7 @@ class LocalStorageEventStore {
     var data = stream.map(domainEvent => {
       return {
         '@type': domainEvent.payload.constructor.name,
+        '@createdAt': domainEvent.createdAt,
         domainEvent: domainEvent
       }
     })
@@ -46,7 +48,8 @@ class LocalStorageEventStore {
   }
 
   append(id, eventStream) {
-    var stream = eventStream.map(payload => new DomainEvent(id, payload))
+    var createdAt = new Date().getTime()
+    var stream = eventStream.map(payload => new DomainEvent(id, payload, createdAt))
     var data = this.getStorage()
     this.setStorage(data.concat(stream))
   }
@@ -63,7 +66,8 @@ class EventStore {
   }
 
   append(id, eventStream) {
-    var stream = eventStream.map(payload => new DomainEvent(id, payload));
+    var createdAt = new Date().getTime()
+    var stream = eventStream.map(payload => new DomainEvent(id, payload, createdAt))
     this.events = this.events || [];
     this.events = this.events.concat(stream);
   }
@@ -125,9 +129,10 @@ class Repository {
 }
 
 class DomainEvent {
-  constructor(id, payload) {
+  constructor(id, payload, createdAt) {
     this.id = id
     this.payload = payload
+    this.createdAt = createdAt
   }
 }
 
